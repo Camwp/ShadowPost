@@ -5,11 +5,7 @@ import {
     Snackbar,
     Alert,
     Button,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    TextField,
+    Typography
 } from '@mui/material';
 import ModeratorLogin from './components/ModeratorLogin';
 import NavBar from './components/NavBar';
@@ -19,6 +15,7 @@ import About from './pages/About';
 import theme from './theme';
 import { ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
+import ModeratorDashboard from './pages/ModeratorDashboard';
 
 const App = () => {
     const [posts, setPosts] = useState([]);
@@ -32,8 +29,6 @@ const App = () => {
     const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [isModeratorLoggedIn, setIsModeratorLoggedIn] = useState(false);
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
@@ -80,26 +75,50 @@ const App = () => {
             });
     };
 
-    const fetchTags = () => {
-        axios
-            .get(`${provider}/api/tags`)
-            .then((res) => setTags(res.data))
-            .catch((err) => console.error('Error fetching tags:', err));
-    };
-
-    const checkSession = () => {
-        axios
-            .get(`${provider}/api/moderators/session`, { withCredentials: true })
-            .then((res) => setIsModeratorLoggedIn(res.data.loggedIn))
-            .catch((err) => console.error('Session check error:', err));
-    };
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
+        const fetchPosts = () => {
+            axios
+                .get(`${provider}/api/posts`, {
+                    params: {
+                        sortField,
+                        sortOrder,
+                        filter: filterType,
+                        tags: selectedTags.join(','),
+                        page: currentPage,
+                        limit: 10,
+                    },
+                    withCredentials: true,
+                })
+
+                .then((res) => {
+                    const { posts = [], total = 0 } = res.data;
+                    setPosts(posts);
+                    setTotalPosts(total);
+                })
+                .catch((err) => {
+                    console.error('Error fetching posts:', err);
+                    setPosts([]);
+                });
+        };
+
+        const fetchTags = () => {
+            axios
+                .get(`${provider}/api/tags`)
+                .then((res) => setTags(res.data))
+                .catch((err) => console.error('Error fetching tags:', err));
+        };
+
+        const checkSession = () => {
+            axios
+                .get(`${provider}/api/moderators/session`, { withCredentials: true })
+                .then((res) => setIsModeratorLoggedIn(res.data.loggedIn))
+                .catch((err) => console.error('Session check error:', err));
+        };
         fetchPosts();
         fetchTags();
         checkSession();
-    }, [sortField, sortOrder, filterType, selectedTags, currentPage]);
+    }, [sortField, sortOrder, filterType, selectedTags, currentPage, provider]);
 
     const handleTagClick = (tag) => {
         setSelectedTags((prev) =>
@@ -130,25 +149,6 @@ const App = () => {
         setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
     };
 
-    const handleLogin = () => {
-        axios
-            .post(`${provider}/api/moderators/login`, { username, password }, { withCredentials: true })
-            .then(() => {
-                setIsModeratorLoggedIn(true);
-                setIsLoginOpen(false);
-                setUsername('');
-                setPassword('');
-                setSnackbarMessage('Logged in successfully!');
-                setSnackbarSeverity('success');
-                setSnackbarOpen(true);
-            })
-            .catch(() => {
-                setSnackbarMessage('Invalid username or password');
-                setSnackbarSeverity('error');
-                setSnackbarOpen(true);
-            });
-    };
-
     const handleLogout = () => {
         axios
             .post(`${provider}/api/moderators/logout`, {}, { withCredentials: true })
@@ -169,7 +169,9 @@ const App = () => {
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <Router>
-                <NavBar onNewPostClick={() => setIsCreatePostOpen(true)} />
+                <NavBar onNewPostClick={() => setIsCreatePostOpen(true)}
+                    isModeratorLoggedIn={isModeratorLoggedIn}
+                />
 
                 <Routes>
                     <Route
@@ -195,6 +197,19 @@ const App = () => {
                         }
                     />
                     <Route path="/about" element={<About />} />
+                    <Route
+                        path="/moderator"
+                        element={
+                            isModeratorLoggedIn ? (
+                                <ModeratorDashboard />
+                            ) : (
+                                <Typography sx={{ mt: 4, textAlign: 'center', color: 'red' }}>
+                                    Access denied. You must be logged in as a moderator.
+                                </Typography>
+                            )
+                        }
+                    />
+
                 </Routes>
 
                 <CreatePost

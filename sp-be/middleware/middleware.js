@@ -13,7 +13,7 @@ const setupMiddleware = (app) => {
     app.use(cors({
         origin: [
             'http://localhost:3000',
-            'https://wallwhisper.netlify.app',
+            'https://shadowpost.netlify.app',
         ],
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -27,7 +27,10 @@ const setupMiddleware = (app) => {
             secret: 'super-secret-key',
             resave: false,
             saveUninitialized: false,
-            store: new SQLiteStore(), // ✅ persist session store
+            store: new SQLiteStore({
+                db: 'moderator-sessions.db', // <-- Change to preferred file name
+                dir: './db',           // <-- Change to preferred directory
+            }),
             cookie: {
                 httpOnly: true, // ✅ very important!
                 secure: !dev,    // true in production, false in dev
