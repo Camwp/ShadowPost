@@ -8,26 +8,25 @@ import {
     DialogContent,
     DialogActions,
 } from '@mui/material';
+import { config } from '../config';
 
 function ModeratorLogin({ open, onClose, onLogin }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const dev = true;
-    const provider = dev ? 'http://localhost:4962' : 'https://casualhorizons.com:4962';
 
     const handleLogin = (e) => {
         e.preventDefault();
 
         axios
             .post(
-                `${provider}/api/moderators/login`,
+                `${config.provider}/api/moderators/login`,
                 { username, password },
                 { withCredentials: true }
             )
             .then(() => {
                 onLogin(); // Notify parent that login succeeded
-                setUsername('');
-                setPassword('');
+                setUsername(''); // Clear field
+                setPassword(''); // Clear field
                 onClose(); // Close dialog
             })
             .catch((error) => {

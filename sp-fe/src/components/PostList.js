@@ -18,7 +18,7 @@ const PostList = ({
                 <Grid item xs={12} key={post.id}>
                     <Card sx={{ backgroundColor: '#1e1e1e', color: '#ffffff', borderRadius: 2, padding: 2 }}>
                         <CardHeader
-                            avatar={<Avatar src={getRandomProfileImage()} />}
+                            avatar={<Avatar src={getRandomProfileImage(new Date(post.timestamp + 'Z').toLocaleString())} />}
                             title={
                                 <Typography variant="h6" sx={{ color: '#ffffff', fontWeight: 'bold' }}>
                                     {post.title || 'Untitled Post'}
@@ -28,8 +28,10 @@ const PostList = ({
                                 <Box display="flex" alignItems="center">
                                     <AccessTime fontSize="small" sx={{ mr: 0.5 }} />
                                     <Typography variant="caption" color="text.secondary">
-                                        {new Date(post.timestamp).toLocaleString()}
+                                        {new Date(post.timestamp + 'Z').toLocaleString()
+                                        }
                                     </Typography>
+
                                 </Box>
                             }
                         />

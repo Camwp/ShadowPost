@@ -11,19 +11,17 @@ import {
     ToggleButtonGroup,
     ToggleButton
 } from '@mui/material';
-
+import { config } from '../config'
 function ModeratorDashboard() {
     const [posts, setPosts] = useState([]);
     const [error, setError] = useState(null);
     const [filter, setFilter] = useState('all');
 
-    const dev = true;
-    const provider = dev ? 'http://localhost:4962' : 'https://casualhorizons.com:4962';
 
     useEffect(() => {
         const fetchPosts = () => {
             axios
-                .get(`${provider}/api/posts`, { withCredentials: true })
+                .get(`${config.provider}/api/posts`, { withCredentials: true })
                 .then((response) => {
                     let data = [];
                     if (Array.isArray(response.data)) {
@@ -49,11 +47,11 @@ function ModeratorDashboard() {
                 });
         };
         fetchPosts();
-    }, [filter, provider]);
+    }, [filter]);
 
     const fetchPosts = () => {
         axios
-            .get(`${provider}/api/posts`, { withCredentials: true })
+            .get(`${config.provider}/api/posts`, { withCredentials: true })
             .then((response) => {
                 let data = [];
                 if (Array.isArray(response.data)) {
@@ -81,7 +79,7 @@ function ModeratorDashboard() {
 
     const deletePost = (id) => {
         axios
-            .delete(`${provider}/api/posts/${id}`, { withCredentials: true })
+            .delete(`${config.provider}/api/posts/${id}`, { withCredentials: true })
             .then(() => fetchPosts())
             .catch((error) => {
                 console.error(error);
@@ -92,7 +90,7 @@ function ModeratorDashboard() {
     const toggleFlagPost = (id, currentHiddenState) => {
         const action = currentHiddenState ? 'unflag' : 'flag';
         axios
-            .patch(`${provider}/api/posts/${id}/${action}`, {}, { withCredentials: true })
+            .patch(`${config.provider}/api/posts/${id}/${action}`, {}, { withCredentials: true })
             .then(() => fetchPosts())
             .catch((error) => {
                 console.error(error);
@@ -142,7 +140,7 @@ function ModeratorDashboard() {
                             {post.image_path && (
                                 <Box
                                     component="img"
-                                    src={`${provider}/${post.image_path}`}
+                                    src={`${config.provider}/${post.image_path}`}
                                     alt="Post"
                                     sx={{ width: '50%', mt: 2, borderRadius: 2, border: '1px solid #444' }}
                                 />

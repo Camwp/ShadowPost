@@ -16,6 +16,7 @@ import theme from './theme';
 import { ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import ModeratorDashboard from './pages/ModeratorDashboard';
+import { config } from './config';
 
 const App = () => {
     const [posts, setPosts] = useState([]);
@@ -33,26 +34,27 @@ const App = () => {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
-    const dev = true;
-    const provider = dev ? 'http://localhost:4962' : 'https://casualhorizons.com:4962';
 
-    const defaultProfileImages = [
-        '/images/pfp1.png',
-        '/images/pfp2.png',
-        '/images/pfp3.png',
-        '/images/pfp4.png',
-        '/images/pfp5.png',
-        '/images/pfp6.png',
-        '/images/pfp7.png',
-    ];
+    const getRandomProfileImage = (date) => {
+        const defaultProfileImages = [
+            '/images/pfp1.png',
+            '/images/pfp2.png',
+            '/images/pfp3.png',
+            '/images/pfp4.png',
+            '/images/pfp5.png',
+            '/images/pfp6.png',
+            '/images/pfp7.png',
+        ];
 
-    const getRandomProfileImage = () => {
-        return defaultProfileImages[Math.floor(Math.random() * defaultProfileImages.length)];
+        const seed = new Date(date).getTime();
+        const index = Math.abs(seed % defaultProfileImages.length);
+        return defaultProfileImages[index];
     };
+
 
     const fetchPosts = () => {
         axios
-            .get(`${provider}/api/posts`, {
+            .get(`${config.provider}/api/posts`, {
                 params: {
                     sortField,
                     sortOrder,
@@ -79,7 +81,7 @@ const App = () => {
     useEffect(() => {
         const fetchPosts = () => {
             axios
-                .get(`${provider}/api/posts`, {
+                .get(`${config.provider}/api/posts`, {
                     params: {
                         sortField,
                         sortOrder,
@@ -104,21 +106,21 @@ const App = () => {
 
         const fetchTags = () => {
             axios
-                .get(`${provider}/api/tags`)
+                .get(`${config.provider}/api/tags`)
                 .then((res) => setTags(res.data))
                 .catch((err) => console.error('Error fetching tags:', err));
         };
 
         const checkSession = () => {
             axios
-                .get(`${provider}/api/moderators/session`, { withCredentials: true })
+                .get(`${config.provider}/api/moderators/session`, { withCredentials: true })
                 .then((res) => setIsModeratorLoggedIn(res.data.loggedIn))
                 .catch((err) => console.error('Session check error:', err));
         };
         fetchPosts();
         fetchTags();
         checkSession();
-    }, [sortField, sortOrder, filterType, selectedTags, currentPage, provider]);
+    }, [sortField, sortOrder, filterType, selectedTags, currentPage]);
 
     const handleTagClick = (tag) => {
         setSelectedTags((prev) =>
@@ -128,7 +130,7 @@ const App = () => {
     };
 
     const handleToggleFlag = (id, isHidden) => {
-        const url = `${provider}/api/posts/${id}/${isHidden ? 'unflag' : 'flag'}`;
+        const url = `${config.provider}/api/posts/${id}/${isHidden ? 'unflag' : 'flag'}`;
         axios
             .patch(url, {}, { withCredentials: true })
             .then(() => {
@@ -151,7 +153,7 @@ const App = () => {
 
     const handleLogout = () => {
         axios
-            .post(`${provider}/api/moderators/logout`, {}, { withCredentials: true })
+            .post(`${config.provider}/api/moderators/logout`, {}, { withCredentials: true })
             .then(() => {
                 setIsModeratorLoggedIn(false);
                 setSnackbarMessage('Logged out successfully!');
@@ -192,7 +194,7 @@ const App = () => {
                                 handleSortChange={handleSortChange}
                                 setCurrentPage={setCurrentPage}
                                 getRandomProfileImage={getRandomProfileImage}
-                                provider={provider}
+                                provider={config.provider}
                             />
                         }
                     />

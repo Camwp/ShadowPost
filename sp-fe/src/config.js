@@ -1,6 +1,7 @@
-// config.js
-
+// client/src/config.js
 const dev = true;
-export const provider = dev
-    ? 'http://localhost:4962'
-    : 'https://casualhorizons.com:4962';
+
+export const config = {
+    dev,
+    provider: dev ? 'http://localhost:4962' : 'https://casualhorizons.com:4962', // Backend Server
+};
