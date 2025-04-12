@@ -42,9 +42,77 @@ router.get('/', (req, res) => {
 
     const offset = (page - 1) * limit;
 
-    let filterCondition = '';
-    if (filter === 'flagged') filterCondition = 'WHERE hidden = 1';
-    else if (filter === 'unflagged') filterCondition = 'WHERE hidden = 0';
+    let filterCondition = 'WHERE hidden = 0'; // Default: hide flagged posts from everyone
+    if (filter === 'flagged') {
+        if (req.session && req.session.isAuthenticated) {
+            filterCondition = 'WHERE hidden = 0';
+        } else {
+            return res.status(403).json({ error: 'Not authorized to view flagged posts' });
+        }
+    } else if (filter === 'unflagged') {
+        filterCondition = 'WHERE hidden = 0';
+    }
+
+    const tagConditions = [];
+    if (tags.trim()) {
+        const tagList = tags.split(',').map(tag => tag.trim());
+        tagList.forEach(tag => {
+            tagConditions.push(`tags LIKE '%${tag}%'`);
+        });
+    }
+
+    const tagCondition = tagConditions.length > 0
+        ? (filterCondition ? ` AND (${tagConditions.join(' OR ')})` : `WHERE (${tagConditions.join(' OR ')})`)
+        : '';
+
+    const totalQuery = `SELECT COUNT(*) AS total FROM posts ${filterCondition} ${tagCondition}`;
+    const postsQuery = `
+        SELECT * FROM posts
+        ${filterCondition} ${tagCondition}
+        ORDER BY ${sortField} ${sortOrder.toUpperCase()}
+        LIMIT ${limit} OFFSET ${offset}
+    `;
+
+    db.get(totalQuery, [], (err, row) => {
+        if (err) return res.status(500).json({ error: 'Failed to fetch post count' });
+        const total = row.total;
+
+        db.all(postsQuery, [], (err, rows) => {
+            if (err) return res.status(500).json({ error: 'Failed to fetch posts' });
+
+            res.json({
+                posts: rows,
+                total,
+                currentPage: Number(page),
+                totalPages: Math.ceil(total / limit),
+            });
+        });
+    });
+});
+
+// GET /api/posts
+router.get('/mod', (req, res) => {
+    const {
+        sortField = 'timestamp',
+        sortOrder = 'desc',
+        filter = 'all',
+        tags = '',
+        page = 1,
+        limit = 10,
+    } = req.query;
+
+    const offset = (page - 1) * limit;
+
+    let filterCondition = ''; // Default: hide flagged posts from everyone
+    if (filter === 'flagged') {
+        if (req.session && req.session.isAuthenticated) {
+            filterCondition = 'WHERE hidden = 0';
+        } else {
+            return res.status(403).json({ error: 'Not authorized to view flagged posts' });
+        }
+    } else if (filter === 'unflagged') {
+        filterCondition = 'WHERE hidden = 0';
+    }
 
     const tagConditions = [];
     if (tags.trim()) {
@@ -111,6 +179,19 @@ router.post('/', upload.single('image'), (req, res) => {
         );
     });
 });
+
+// DELETE /api/posts/:id
+router.delete('/:id', authenticateSession, (req, res) => {
+    const postId = req.params.id;
+
+    db.run(`DELETE FROM posts WHERE id = ?`, [postId], function (err) {
+        if (err) return res.status(500).json({ error: 'Failed to delete post.' });
+        if (this.changes === 0) return res.status(404).json({ error: 'Post not found.' });
+
+        res.status(200).json({ message: 'Post deleted successfully.' });
+    });
+});
+
 
 // PATCH /api/posts/:id/flag
 router.patch('/:id/flag', authenticateSession, (req, res) => {

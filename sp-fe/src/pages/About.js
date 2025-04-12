@@ -10,7 +10,7 @@ const About = () => (
             </Typography>
             <Typography variant="body1" color="white">
                 ShadowPost is a place to post anonymous thoughts and share ideas with the world.
-                Moderators help keep it clean and supportive. This page is just here so you can test routing.
+                Moderators help keep it clean and supportive. This page will be a more in-depth "about page" eventually.
             </Typography>
         </Box>
     </Container>

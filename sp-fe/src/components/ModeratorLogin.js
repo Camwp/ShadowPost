@@ -8,12 +8,10 @@ import {
     DialogContent,
     DialogActions,
 } from '@mui/material';
-
+import { provider } from '.././config'
 function ModeratorLogin({ open, onClose, onLogin }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const dev = true;
-    const provider = dev ? 'http://localhost:4962' : 'https://casualhorizons.com:4962';
 
     const handleLogin = (e) => {
         e.preventDefault();

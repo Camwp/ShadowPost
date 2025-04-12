@@ -9,12 +9,15 @@ dotenv.config();
 
 // Dev: True or False
 const devProvider = true;
+const PORT = 4962;
+const DEVPORT = 4962;
 let provider;
 if (devProvider) {
     provider = "http://localhost:3000"
 } else {
-    provider = "https://wallwhisper.netlify.app"
+    provider = "https://casualhorizons.com:3000"
 }
+
 
 // Setup Middleware
 const setupMiddleware = require('./middleware/middleware');
@@ -44,8 +47,7 @@ app.use('/api', tagRoutes);
 
 
 
-const PORT = 4962;
-const DEVPORT = 4962;
+
 if (devProvider) {
     // Start the HTTP server
     http.createServer(app).listen(DEVPORT, '0.0.0.0', () => {

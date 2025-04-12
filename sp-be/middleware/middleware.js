@@ -28,11 +28,11 @@ const setupMiddleware = (app) => {
             resave: false,
             saveUninitialized: false,
             store: new SQLiteStore({
-                db: 'moderator-sessions.db', // <-- Change to preferred file name
-                dir: './db',           // <-- Change to preferred directory
+                db: 'moderator-sessions.db',
+                dir: './db',
             }),
             cookie: {
-                httpOnly: true, // ✅ very important!
+                httpOnly: true,
                 secure: !dev,    // true in production, false in dev
                 sameSite: dev ? 'Lax' : 'None',
                 maxAge: 30 * 24 * 60 * 60 * 1000,

@@ -23,7 +23,7 @@ function ModeratorDashboard() {
     useEffect(() => {
         const fetchPosts = () => {
             axios
-                .get(`${provider}/api/posts`, { withCredentials: true })
+                .get(`${provider}/api/posts/mod`, { withCredentials: true })
                 .then((response) => {
                     let data = [];
                     if (Array.isArray(response.data)) {
