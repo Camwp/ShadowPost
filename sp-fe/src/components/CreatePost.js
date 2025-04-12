@@ -11,7 +11,7 @@ import {
     DialogActions,
 } from '@mui/material';
 import axios from 'axios';
-import { provider } from '../config';
+import { config } from '../config';
 
 function CreatePost({ open, onClose, refreshPosts }) {
     const [title, setTitle] = useState('');
@@ -22,10 +22,10 @@ function CreatePost({ open, onClose, refreshPosts }) {
 
 
     useEffect(() => {
-        axios.get(`${provider}/api/tags`)
+        axios.get(`${config.provider}/api/tags`)
             .then((response) => setTags(response.data.map(tag => tag.name)))
             .catch((error) => console.error('Error fetching tags:', error));
-    }, [provider]);
+    }, []);
 
     const handleSubmit = () => {
         const formData = new FormData();
@@ -35,9 +35,9 @@ function CreatePost({ open, onClose, refreshPosts }) {
         if (image) formData.append('image', image);
 
         axios
-            .post(`${provider}/api/posts`, formData, {
+            .post(`${config.provider}/api/posts`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
-                withCredentials: true, // ✅ Include cookies (session ID)
+                withCredentials: true, // Include cookies (session ID)
             })
             .then(() => {
                 setTitle('');

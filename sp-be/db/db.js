@@ -43,8 +43,8 @@ const initializeTables = () => {
     `);
 };
 
-const createDefaultModerator = (shouldCreate = false) => {
-    if (!shouldCreate) return;
+const createDefaultModerator = (shouldCreateMod = false) => {
+    if (!shouldCreateMod) return;
 
     const defaultUser = 'user';
     const defaultPass = bcrypt.hashSync('pass', 10);
@@ -59,8 +59,31 @@ const createDefaultModerator = (shouldCreate = false) => {
     );
 };
 
+const loadDefaultTags = (shouldCreateTags = false) => {
+    if (!shouldCreateTags) return;
+
+    const tags = [
+        "Image",
+        "Rant",
+        "Work",
+        "TIL"
+    ]
+    // Insert default tags
+    tags.forEach(tag => {
+        db.run(
+            `INSERT OR IGNORE INTO tags (name) VALUES (?)`,
+            [tag],
+            (err) => {
+                if (err) console.error(`Error inserting tag '${tag}':`, err.message);
+                else console.log(`✅ Tag '${tag}' added.`);
+            }
+        );
+    });
+};
+
 module.exports = {
     db,
     initializeTables,
-    createDefaultModerator
+    createDefaultModerator,
+    loadDefaultTags
 };

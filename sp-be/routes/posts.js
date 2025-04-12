@@ -217,4 +217,19 @@ router.patch('/:id/unflag', authenticateSession, (req, res) => {
     );
 });
 
+// DELETE /api/posts/:id
+router.delete('/:id', authenticateSession, (req, res) => {
+    const postId = req.params.id;
+
+    db.run(`DELETE FROM posts WHERE id = ?`, [postId], function (err) {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Failed to delete post.' });
+        }
+
+        res.status(200).json({ message: 'Post deleted successfully.' });
+    });
+});
+
+
 module.exports = router;

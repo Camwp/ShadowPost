@@ -1,4 +1,5 @@
 const express = require('express');
+const config = require('./config');
 const dotenv = require('dotenv');
 const https = require('https');
 const http = require('http');
@@ -24,8 +25,9 @@ const setupMiddleware = require('./middleware/middleware');
 setupMiddleware(app);
 
 // Setup DB and Initialize tables if not existing
-const { db, initializeTables, createDefaultModerator } = require('./db/db');
+const { db, initializeTables, createDefaultModerator, loadDefaultTags } = require('./db/db');
 initializeTables();
+loadDefaultTags();
 createDefaultModerator(false); // Set to true if needed
 
 
@@ -50,18 +52,18 @@ app.use('/api', tagRoutes);
 
 if (devProvider) {
     // Start the HTTP server
-    http.createServer(app).listen(DEVPORT, '0.0.0.0', () => {
-        console.log(`Server running on http://localhost:${DEVPORT}/`);
+    http.createServer(app).listen(config.port, '0.0.0.0', () => {
+        console.log(`Server running on http://localhost:${config.port}/`);
     });
 } else {
     // Start the HTTPS server
     const httpsOptions = {
-        key: fs.readFileSync('/etc/letsencrypt/live/casualhorizons.com/privkey.pem'),
-        cert: fs.readFileSync('/etc/letsencrypt/live/casualhorizons.com/fullchain.pem')
+        key: fs.readFileSync(config.httpsOptions.keyPath),
+        cert: fs.readFileSync(config.httpsOptions.certPath)
     };
 
     const server = https.createServer(httpsOptions, app);
-    server.listen(PORT, '0.0.0.0', () => {
+    server.listen(config.port, '0.0.0.0', () => {
         console.log(`Server running on https://0.0.0.0:${PORT}/`);
     });
 

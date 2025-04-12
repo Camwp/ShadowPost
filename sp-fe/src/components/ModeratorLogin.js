@@ -8,7 +8,7 @@ import {
     DialogContent,
     DialogActions,
 } from '@mui/material';
-import { provider } from '.././config'
+import { config } from '.././config'
 function ModeratorLogin({ open, onClose, onLogin }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -18,14 +18,14 @@ function ModeratorLogin({ open, onClose, onLogin }) {
 
         axios
             .post(
-                `${provider}/api/moderators/login`,
+                `${config.provider}/api/moderators/login`,
                 { username, password },
                 { withCredentials: true }
             )
             .then(() => {
                 onLogin(); // Notify parent that login succeeded
-                setUsername('');
-                setPassword('');
+                setUsername(''); // Clear field
+                setPassword(''); // Clear field
                 onClose(); // Close dialog
             })
             .catch((error) => {
