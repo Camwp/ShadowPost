@@ -6,14 +6,14 @@ const { authenticateSession } = require('./moderators');
 
 const router = express.Router();
 
-// Multer config
+// Multer config for image uploading
 const storage = multer.diskStorage({
     destination: 'uploads/',
     filename: (req, file, cb) => {
         cb(null, `${Date.now()}-${file.originalname}`);
     },
 });
-
+// handle image uploading to specific location of specific image types
 const upload = multer({
     storage,
     limits: { fileSize: 5 * 1024 * 1024 },

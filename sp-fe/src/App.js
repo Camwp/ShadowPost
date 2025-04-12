@@ -18,6 +18,7 @@ import axios from 'axios';
 import ModeratorDashboard from './pages/ModeratorDashboard';
 import { config } from './config';
 
+// Self explainatory App
 const App = () => {
     const [posts, setPosts] = useState([]);
     const [tags, setTags] = useState([]);
@@ -34,7 +35,7 @@ const App = () => {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
-
+    // List of pfp's to select from and random way to fetch
     const getRandomProfileImage = (date) => {
         const defaultProfileImages = [
             '/images/pfp1.png',
@@ -51,7 +52,7 @@ const App = () => {
         return defaultProfileImages[index];
     };
 
-
+    // grab certain posts that relate to filters and sorting
     const fetchPosts = () => {
         axios
             .get(`${config.provider}/api/posts`, {
@@ -103,17 +104,17 @@ const App = () => {
                     setPosts([]);
                 });
         };
-
+        //get tags to filter by
         const fetchTags = () => {
             axios
                 .get(`${config.provider}/api/tags`)
                 .then((res) => setTags(res.data))
                 .catch((err) => console.error('Error fetching tags:', err));
         };
-
+        //check moderators logged in session
         const checkSession = () => {
             axios
-                .get(`${config.provider}/api/moderators/session`, { withCredentials: true })
+                .get(`${config.provider}/api/moderators/session`, { withCredentials: true }) // send credentials to api
                 .then((res) => setIsModeratorLoggedIn(res.data.loggedIn))
                 .catch((err) => console.error('Session check error:', err));
         };
@@ -128,7 +129,7 @@ const App = () => {
         );
         setCurrentPage(1);
     };
-
+    // toggle whether a post is hidden or not
     const handleToggleFlag = (id, isHidden) => {
         const url = `${config.provider}/api/posts/${id}/${isHidden ? 'unflag' : 'flag'}`;
         axios
@@ -145,12 +146,12 @@ const App = () => {
                 setSnackbarOpen(true);
             });
     };
-
+    // handle sorting order of posts
     const handleSortChange = (field) => {
         setSortField(field);
         setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
     };
-
+    //logout method for moderators to securely erase session token
     const handleLogout = () => {
         axios
             .post(`${config.provider}/api/moderators/logout`, {}, { withCredentials: true })
@@ -166,7 +167,7 @@ const App = () => {
                 setSnackbarOpen(true);
             });
     };
-
+    // return html
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />

@@ -17,7 +17,7 @@ function ModeratorDashboard() {
     const [error, setError] = useState(null);
     const [filter, setFilter] = useState('all');
 
-
+    //on first load
     useEffect(() => {
         const fetchPosts = () => {
             axios
@@ -48,7 +48,7 @@ function ModeratorDashboard() {
         };
         fetchPosts();
     }, [filter]);
-
+    // get posts from backend for moderators
     const fetchPosts = () => {
         axios
             .get(`${config.provider}/api/posts`, { withCredentials: true })
@@ -86,7 +86,7 @@ function ModeratorDashboard() {
                 setError('Failed to delete post.');
             });
     };
-
+    // toggling of post visibility
     const toggleFlagPost = (id, currentHiddenState) => {
         const action = currentHiddenState ? 'unflag' : 'flag';
         axios

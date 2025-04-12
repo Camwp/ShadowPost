@@ -13,7 +13,7 @@ To start a test server on your computer:
 
 This software was written to explore how to implement authentication, image handling, RESTful APIs, and dynamic filtering. The backend uses SQLite for a lightweight database and includes a moderator login system that persists across sessions.
 
-[Software Demo Video](http://youtube.link.goes.here)
+[Software Demo Video](https://www.youtube.com/watch?v=Cs-CzqB6SYA)
 
 # Web Pages
 
